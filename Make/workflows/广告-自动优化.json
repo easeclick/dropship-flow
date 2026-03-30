@@ -1,0 +1,34 @@
+{
+  "name": "广告自动优化",
+  "trigger": {
+    "type": "schedule",
+    "schedule": "every 4 hours"
+  },
+  "modules": [
+    {
+      "module": "HTTP",
+      "action": "Make a request",
+      "url": "{{API_BASE_URL}}/api/ads/optimize",
+      "method": "POST",
+      "headers": {
+        "Authorization": "Bearer {{API_KEY}}"
+      }
+    },
+    {
+      "module": "Router",
+      "routes": [
+        {
+          "condition": "{{optimized}} > 0",
+          "modules": [
+            {
+              "module": "Slack",
+              "action": "Send a message",
+              "channel": "#ads-optimization",
+              "text": "📊 广告优化完成: 调整 {{optimized}} 个, 暂停 {{paused}} 个"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

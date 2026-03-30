@@ -1,0 +1,34 @@
+{
+  "name": "选品定时扫描",
+  "trigger": {
+    "type": "schedule",
+    "schedule": "every 6 hours"
+  },
+  "modules": [
+    {
+      "module": "HTTP",
+      "action": "Make a request",
+      "url": "{{API_BASE_URL}}/api/selector/run",
+      "method": "POST",
+      "headers": {
+        "Authorization": "Bearer {{API_KEY}}"
+      }
+    },
+    {
+      "module": "Router",
+      "routes": [
+        {
+          "condition": "{{scanned}} > 0",
+          "modules": [
+            {
+              "module": "Slack",
+              "action": "Send a message",
+              "channel": "#dropship-alerts",
+              "text": "🔍 选品完成: 扫描 {{scanned}} 个商品, 保存 {{saved}} 个"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

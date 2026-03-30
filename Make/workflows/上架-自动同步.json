@@ -1,0 +1,31 @@
+{
+  "name": "自动上架",
+  "trigger": {
+    "type": "webhook",
+    "url": "{{API_BASE_URL}}/api/webhook/make"
+  },
+  "modules": [
+    {
+      "module": "Router",
+      "routes": [
+        {
+          "label": "上架商品",
+          "condition": "{{action}} = 'publish'",
+          "modules": [
+            {
+              "module": "HTTP",
+              "action": "Make a request",
+              "url": "{{API_BASE_URL}}/api/publisher/publish/{{productId}}",
+              "method": "POST"
+            },
+            {
+              "module": "Facebook Ads",
+              "action": "Create a Campaign",
+              "name": "Campaign for {{productId}}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

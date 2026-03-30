@@ -1,0 +1,77 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  id            String    @id @default(uuid())
+  sourceId      String?   @map("source_id")
+  shopifyId     String?   @map("shopify_id")
+  source        String    @default("aliexpress")
+  title         String
+  description   String?   @db.Text
+  imageUrl      String?   @map("image_url")
+  costPrice     Float     @map("cost_price")
+  sellPrice     Float     @map("sell_price")
+  profit        Float
+  weight        Float?
+  category      String?
+  status        String    @default("pending")
+  adsCreated    Boolean   @default(false) @map("ads_created")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  ads           Ad[]
+  orders        Order[]
+}
+
+model Ad {
+  id            String    @id @default(uuid())
+  productId     String    @map("product_id")
+  platform      String
+  adId          String?   @map("ad_id")
+  adSetId       String?   @map("ad_set_id")
+  campaignId    String?   @map("campaign_id")
+  status        String    @default("pending")
+  budget        Float     @default(10)
+  spend         Float     @default(0)
+  impressions   Int       @default(0)
+  clicks        Int       @default(0)
+  conversions   Int       @default(0)
+  revenue       Float     @default(0)
+  roas          Float     @default(0)
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  product       Product   @relation(fields: [productId], references: [id])
+}
+
+model Order {
+  id              String    @id @default(uuid())
+  shopifyOrderId  String?   @map("shopify_order_id")
+  productId       String    @map("product_id")
+  customerName    String?   @map("customer_name")
+  customerEmail   String?   @map("customer_email")
+  shippingAddress String?   @map("shipping_address") @db.Text
+  amount          Float
+  cost            Float
+  profit          Float
+  currency        String    @default("USD")
+  status          String    @default("pending")
+  trackingNumber  String?   @map("tracking_number")
+  createdAt       DateTime  @default(now()) @map("created_at")
+  updatedAt       DateTime  @updatedAt @map("updated_at")
+
+  product         Product   @relation(fields: [productId], references: [id])
+}
+
+model Setting {
+  id        String   @id @default(uuid())
+  key       String   @unique
+  value     String   @db.Text
+  updatedAt DateTime @updatedAt @map("updated_at")
+}
